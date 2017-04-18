@@ -1,0 +1,77 @@
+STANDARD VEC DATA STRUCTURE
+
+Section 6.2 explains array doubling.  There is a fairly simple C
+data structure to support this.  This example need not be followed exactly.
+
+struct IntVecNode
+    {
+    int * data;
+    int sz;
+    int capacity;
+    };
+
+The constructor callocs one "struct IntVecNode".
+calloc() returns a pointer to it (which is type IntVec).
+Say the constructor stores the value of that pointer in a local variable
+named newVec, e.g.,
+
+    newVec = calloc(1, sizeof(struct IntVecNode)).
+
+Alternatively, the call might be
+
+    newVec = malloc(1*sizeof(struct IntVecNode)).
+
+THIS STRUCT NEVER MOVES.
+
+The constructor now callocs space for intInitCap ints (i.e., 4, based on
+the value in intVec.h) and stores THAT pointer in newVec->data.
+Two ways to do this are:
+
+    newVec->data = calloc(intInitCap, sizeof(int));
+
+or
+
+    newVec->data = malloc(intInitCap * sizeof(int));
+
+THE VALUE OF newVec->data CAN CHANGE WHEN THE ARRAY SIZE IS DOUBLED.
+Now newVec->sz is initialized to 0 and newVec->capacity is initialized to
+intInitCap.
+
+After completing the initialization of the struct, the constructor returns
+the pointer to it (newVec in the example).  The returned value is saved by
+the client (say as myVec, for following examples) and is used for
+future IntVec operations on this object.
+
+ADT operations pass in myVec with the value returned by the constructor
+(i.e., newVec) to specify which IntVec ADT object they are operating on.
+
+When array doubling is needed, call realloc as follows:
+
+    newCap = 2 * myVec->capacity;
+    newData = realloc(myVec->data, newCap * sizeof(int));
+
+EVEN IF newData == myVec->data, THE SPACE ALLOCATED TO IT HAS DOUBLED!
+It is a good idea to check that newData != NULL.
+Assuming not, continue by updating the struct fields:
+
+    if (newData != myVec->data) { myVec->data = newData; }
+    myVec->capacity = newCap;
+
+Read "man realloc" for more details.
+
+Although it is not a grading issue (unless your program bombs),
+it is good practice to check values returned by calloc, malloc, realloc,
+and all C-library functions for that matter.
+It will probably save you a lot of debugging time if you
+notice an unexpected return value as soon as it happens.
+
+NOTE THAT THE SPELLING OF intVec.c and intVec.h must be exactly as shown.
+
+A starter intVec.h is in the course locker, but you should replace the
+questions with your own comments.
+In fact, you MUST NOT make any changes EXCEPT comments, because other
+students will be using your compiled intVec.o, as compiled by the
+testing scripts.
+
+Your comments in intVec.h should document the functions declared in that file,
+especially preconditions and postconditions.

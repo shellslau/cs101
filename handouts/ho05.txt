@@ -1,0 +1,105 @@
+CMPS 101 Spring 2017         HANDOUT 05              Apr. 07, 2017
+
+This file is ho05.txt in Handouts off the class web page and
+in the class locker, which is /afs/cats.ucsc.edu/courses/cmps101-avg/
+
+USEFUL UNIX COMMANDS AND EDITOR SKILLS
+
+(especially since they will be on an exam)
+
+UNIX
+
+CAN YOU MATCH these interactive commands to their functions?
+Also, it is a good idea to know how to exit each one.
+
+emacs  evince  firefox  gdb  mail  man  more  vi  view
+
+1. display file contents on terminal
+
+2. browse an ascii file
+
+3. edit a file
+
+4. send a message, or read messages from others
+
+5. browse a pdf file
+
+6. access the Internet
+
+7. get information on a command
+
+8. debug your program in C
+
+CAN YOU MATCH these non-interactive commands to their functions?
+
+cd  cp  diff  gcc  grep  history  lpr  ls  make  man  mkdir  mv  pwd  rm
+
+9. connect to a directory
+
+10. copy a file or files
+
+11. rename a file
+
+12. delete a file
+
+13. create a directory
+
+14. compile with specified flags and files in C or other languages
+
+15. move a file or files to a different directory
+
+16. print a file on paper (somewhere)
+
+17. display recent commands on terminal
+
+18. display a list of commands relevant to a keyword
+
+19. compare two files and print lines that differ
+
+20. search for a string (or regular expression) in one or more files
+
+21. display the name of the current directory
+
+22. list file names, and perhaps properties, in current directory
+
+23. compile C files
+
+
+
+EDITOR SKILLS
+
+Being proficient with your editor is important for getting your work
+done in Computer Science.
+You should know the answers for whatever editor you would use for these
+tasks, and GIVE ITS NAME when you get these questions on an exam.
+
+Describe a procedure in your editor to search for
+a string, say ``node''.
+    . How do you find the first occurrence?
+    . How do you find subsequent occurrences WITHOUT RETYPING THE STRING?
+    . Does the search wrap around?
+    . How can you search backwards?
+
+Describe a procedure in your editor to copy a portion of one file into
+another file.  It must be able to copy more than one screenful, and copy
+actual file contents (such as tab characters), not just their screen
+appearance.  To be specific, say you want to copy lines 150 to 250 from
+old.c into new.c.
+
+Describe a procedure in your editor to copy a portion of one file into
+another place in the same file.  To be specific, say you want to copy
+lines 150 to 250 and insert them after line 300.
+
+Describe a procedure in your editor to replace some, but not necessarily
+all, occurrences of an old string with a new string.  (This is often
+called ``query replace''.) Your method must involve typing the old
+string and the new string ONLY ONCE EACH, so there is no possibility of
+inconsistent replacements.
+
+To be specific, say you want to replace ``Term'' by ``Symbol'' in selected
+occurrences, even if the occurrence is not a whole word, but not if it
+happens to be in ``Terminate'', ``Terminal''  and such.
+
+
+
+==========================================================================

@@ -1,0 +1,308 @@
+Use of gdb for C programs. You should have compiled with "gcc -g" for best 
+results. Make sure to update your makefile to include the -g option if you 
+are using one.
+
+Start from unix with "gdb <program>".  We'll assume "myprog" for some of 
+the examples.  It would be started by "gdb myprog".
+
+Use "quit" to exit back to unix.
+
+CASE 1: Run the program and catch it if it bombs.
+-------------------------------------------------
+
+Ensure that your Makefile includes the -g option, usually in CFLAGS.
+
+Say you would otherwise type "myprog input1" to run.  Instead, do:
+
+	gdb myprog
+	run input1
+
+Note: after entering gdb myprog, you should see the gdb start screen:
+
+GNU gdb 6.8
+Copyright ...
+...
+This GDB was configured as ...
+(gdb)
+
+The last line is your PROMPT.  This is where you get to type "run input1".
+In examples below DO NOT type "(gdb)", just finish the line.
+
+Now say myprog bombs (this might be a failed assertion).
+You want to see how it got there.  The "where" command prints a list of all 
+stack frames, along with the function argument values for each stack frame
+	
+	(gdb) where
+	
+Level 0 is your current stack frame where the crash occurred.
+You will see that main() is the highest or next to highest level.
+This is the call stack when the crash occurred
+
+To move up and down the call stack:
+
+	(gdb) up
+	(gdb) down
+	(gdb) up 3
+
+etc.
+
+The list command (abbreviation l) will display source code.
+To look at some source lines around where it bombed, you can simply do
+
+	(gdb) l
+
+Use the following commands to list certain lines:
+	
+	(gdb) l 5          list starting with line number 5
+	(gdb) l 21, 25     list between lines 21 and 25
+	
+
+Try "help list" for other useful list commands:	
+
+Now look at the value of suspicious variables that might have bombed it. 
+You can view them using the print command, abbreviated p.
+
+	(gdb) print x
+	(gdb) p line[i]
+	(gdb) p myvec->data[i]
+	(gdb) p * myvec
+
+Maybe go up to the caller of this function and do the same things.
+
+	(gdb) up	;# move up the call stack
+	(gdb) l 120,170	;# view the source code between lines 120 and 170
+	(gdb) p z	;# print the value of variable z
+
+Suppose z points to a struct.  Print one field or the whole struct.
+
+	(gdb) p edgeE.from
+	(gdb) p edgeE.to
+
+For example:
+
+Breakpoint 7, parseEdge (line=0x7fff5fbff050 "1 2 .5\n") at LoadGraph.c:31
+31		if (numFields < 2 || numFields >3) {
+(gdb) print newE.from
+$2 = 1
+(gdb) print newE.to
+$3 = 2
+
+
+To print a struct in a more readable format, use:
+	
+	(gdb) set print pretty on
+
+Turn it off by typing
+	
+	(gdb) set print pretty off
+
+Suppose z is a linked list.  Print the next three nodes.
+
+	(gdb) p *(z->next)
+	(gdb) p *(z->next->next)
+	(gdb) p *(z->next->next->next)
+
+
+Many times you have an idea what went wrong by this time and are ready
+to change the source code and recompile.
+
+	(gdb) q
+
+If not, go on to Case 2.
+
+
+CASE 2: Set some breakpoints so you can trace after a certain point.
+--------------------------------------------------------------------
+
+You can create break points within the program by using the following 
+syntax, noting that "b" abbreviates "break":
+
+	(gdb) b 10           break at line_number 10 
+	(gdb) b myFile.c:10  break at line_number 10 in myFile.c
+	(gdb) b funName      break at beginning of funName: 
+	(gdb) b myFile.c:funName  break at funName in myFile.c: 
+
+Say you have set a breakpoint at a certain line of your source code. Run 
+(r command) the program and it will stop at your break point.
+
+To execute the next line of code, type the next (n) command.
+You will get output that looks something like this:
+
+	Breakpoint 1, main () at factorial.c:5
+	5		int i = 3;
+	(gdb) n
+	6		int num = 0;
+
+To run the program to the next break point, type the continue command.
+Abbreviation "cont" works.  "c" might work; be careful.
+
+	Breakpoint 1, main () at factorial.c:5
+	5		int i = 3;
+	(gdb) cont
+	Continuing.
+
+	Breakpoint 2, main () at factorial.c:9
+	9		scanf ("%d", &num );
+
+Use "step" or "s" to step INTO function calls and trace them in detail.
+
+	(gdb) s
+
+If you are at a line with function call and do 'n' it executes the whole line
+and then stops and gives the prompt.
+
+If you are in a loop and you just want to check x each time around, 
+without doing "n" for each statement, you have a couple of options. You can 
+either set multiple break points. Or, if you know the number of times that 
+the loop executes you can do the following:
+
+Set a break point before the start of your loop. For example:
+
+	(gdb) b 11
+
+Then print the value of the variable in the loop the number of times that 
+it goes through the loop. These values will be output as an array.
+
+	(gdb) print i@number of times loop is executed
+
+For example:
+
+Breakpoint 3, main () at factorial.c:11
+11		for (i=1; i<num; i++)
+(gdb) p i@6
+$4 = {3, 1606416712, 32767, 3692, 1, 0}
+
+
+Now try typing "i b" (for "info breakpoint").  As you can see, you will get a 
+list of all breakpoints and their current status.
+
+For example:
+
+Num Type           Disp Enb Address            What
+1   breakpoint     keep y   0x0000000100000e7c in main at factorial.c:4
+	breakpoint already hit 1 time
+2   breakpoint     keep y   0x0000000100000ea2 in main at factorial.c:9
+	breakpoint already hit 1 time
+
+
+Gdb assigns a number to each breakpoint. It will be located to the left of 
+your breakpoint when you type "i b". You can delete a breakpoint using this 
+number.
+
+For example: 
+	
+(gdb) delete 2
+(gdb) i b
+Num Type           Disp Enb Address            What
+1   breakpoint     keep y   0x0000000100000e7c in main at factorial.c:4
+	breakpoint already hit 1 time
+
+Or, you can use the clear command and the location of the breakpoint.
+
+For example:
+
+(gdb) clear main
+Deleted breakpoint 1
+
+
+This covers the basics.  You can do very sophisticated things in gdb, but 
+it might be faster and easier to put in some printf's and recompile.
+
+
+CASE 3: Check for bad pointers, uninitialized variables, etc.
+--------------------------------------------------------------------
+
+RECOMMENDED: Use valgrind!  Read up on it if things get too complicated.
+
+First do "q" to exit gdb.
+Then type "valgrind myprog input1".
+
+Say you want to try in gdb a little bit before switching to valgrind:
+
+Now gdb will stop the program if it detects one of the above memory-access
+errors, as well as a failed assertion, as well as seg-faults, bus errors,
+and the like.  Bad pointers include array indexes wildly out of range.
+
+A final useful tip is to use the display command. Say you have a variable 
+that you wish to monitor over the course of a run through the program. Use 
+the display command and then go through the variable values using next.
+
+	display i ;# will output something like the following
+			;# 1: i = -1207447872
+	next		;# 1: i = 2
+
+Continue typing "n" until the program finishes running. To undisplay the 
+variable, use the number to the left of the variable name.
+	
+	undisplay 1
+
+
+Case 4: Putting it all together - What to do if you get a seg fault
+
+If you run into a seg fault, try the following combination of commands.
+1. Run the program with r and let the program reach its seg fault
+2. Use the where command to see where the program segfaulted
+3. Now use the list command to view code around the segfault
+4. Use print to view variables associated with the code around the 
+segfault
+5. Also examine function calls by moving up and down the stack of frames
+
+Commonly-used gdb commands
+---------------------------------------------------------------------------
+help                  List classes of all gdb commands
+help <topic>          Shows help available for topic or command
+
+where     	      Shows stack: sequence of function calls executed so 
+far
+(or backtrace)        (good for pinpointing location of a program crash)
+(or bt)
+
+frame                 Shows all stack frames
+frame <frame-num>     Sets current stack frame to <frame-num>
+info frame            Show state about current stack frame
+
+run                   Starts program at the beginning
+
+break <line>          Sets breakpoint at line number <line>
+break <func-name>     Sets breakpoint at beginning of function <func-name>
+break main            Sets breakpoint at beginning of program
+continue              Continues execution from breakpoint
+
+condition <bp-num> <exp>   Sets breakpoint number <bp-num> to break only 
+if
+                           conditional expression <exp> is true
+
+info break            Shows current breakpoints
+disable [breakpoints] [bnums ...]  Disable one or more breakpoints
+enable [breakpoints] [bnums ...]   Enable one or more breakpoints 
+clear <line>          Clears breakpoint at line number <line>
+clear <func-name>     Clears breakpoint at beginning of function 
+<func-name>
+delete <bp-num>       Deletes breakpoint number <bp-num>
+delete                Deletes all breakpoints
+
+step (or s)           Executes next line of program (steping into 
+functions)
+step <count>          Executes next <count> lines of program
+next (or n)           Like step, but treats a function call as a single
+next <count>            instruction
+until <line>          Executes program until line number <line>
+
+print <exp> (or inspect <exp>  Displays the value of expression <exp>
+display <exp>         Automatic display of <exp> each time a breakpoint 
+reached
+whatis <exp>          Shows data type of expression <exp>
+info locals           Shows local variables in current stack frame
+set variable <variable> = <exp>   Sets variable <variable> to expression 
+<exp>
+
+list                  Lists next few lines of program
+list <line>           Lists lines around line number <line> of program
+list <start> <end>    Lists line numbers <start> through <end>
+list <func-name>      Lists lines at beginning of function <func-name>
+
+quit                  Quits gdb
+
+
+For a useful guide to further commands, visit 
+http://www.yolinux.com/TUTORIALS/GDB-Commands.html
