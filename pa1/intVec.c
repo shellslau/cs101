@@ -1,4 +1,6 @@
-
+/* Michelle Slaughter
+ * mislaugh
+ */
 #include "intVec.h"
 
 static const int intInitCap = 4;

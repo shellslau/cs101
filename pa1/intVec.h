@@ -1,5 +1,7 @@
 /* intVec.h
  * this should outline the intVec class. It gives functions and what should happen in those functions.
+ * Michelle Slaughter
+ * mislaugh
  */
 
 #ifndef C101IntVec
